@@ -1,0 +1,12 @@
+{% if messages %}
+
+    {% for message in messages %}
+<div class="alert alert-{% if message.tags %}{% if 'error' in message.tags %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}">
+    {{ message }}
+</div>
+
+
+
+    {% endfor %}
+
+{% endif %}

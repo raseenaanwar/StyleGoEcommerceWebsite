@@ -1,0 +1,346 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block content %}
+  <!-- Page Header Start -->
+  <div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 250px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Shop Detail</h1>
+
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-5">
+
+
+    <div class="row px-xl-5 ">
+        <div class="col-lg-5 pb-5">
+            <div id="product-carousel" class="carousel slide" data-ride="carousel">
+               <div class="carousel-inner border">
+    {% for image in products.images.all %}
+        <div class="carousel-item{% if forloop.first %} active{% endif %}">
+            <div style="height: 600px; width: 100%; overflow: hidden;">
+                <img style="object-fit: cover; width: 100%; height: 100%;" src="{{ image.image.url }}" alt="Image">
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+                <a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
+                    <i class="fa fa-2x fa-angle-left text-dark"></i>
+                </a>
+                <a class="carousel-control-next" href="#product-carousel" data-slide="next">
+                    <i class="fa fa-2x fa-angle-right text-dark"></i>
+                </a>
+            </div>
+        </div>
+
+
+            <div class="col-lg-7 pb-5">
+                <h3 class="font-weight-semi-bold"><strong>{{products.product_name | title}}</strong></h3>
+                <div class="d-flex mb-3">
+                  <div class="text-primary mr-2">
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star-half-alt"></small>
+                        <small class="far fa-star"></small>
+                    </div>
+                    <small class="pt-1">(50 Reviews)</small>
+                </div>
+
+
+                {% with offered_price=products.calculate_offered_price %}
+                            {% if products.price > offered_price %}
+                <h3 >
+                            <span style="text-decoration: line-through;">Rs.{{products.price}}</span>
+  &nbsp;&nbsp;&nbsp;
+                         Rs. {{ offered_price }}
+                        </h3>
+                        {% else %}
+                        <h3> Rs. {{ products.price }}</h3>
+                        {% endif %}
+
+                    {% endwith %}
+
+<!--                <h3 class="font-weight-semi-bold mb-4">Rs.{{products.price}}</h3>-->
+                <p class="mb-4">{{products.description | title}}</p>
+
+`<form method="post" id="commonForm">
+    {% csrf_token %}
+ <div class="d-flex mb-4">
+   <div class="form-group">
+    <input type="hidden" value="{{ products.id }}" id="pid">
+<!--       <h1>{{products.id}}</h1>-->
+    <label for="color" class="text-dark font-weight-medium mb-0 mr-3"><strong>Color</strong></label>
+    <select class="custom-select" id="color" required>
+        <option value="" disabled selected>Choose Color</option>
+        {% for color in colors %}
+            <option value="{{ color.color__id }}">{{ color.color__color_name }}</option>
+        {% endfor %}
+    </select>
+</div>
+    <div class="form-group">
+        <label for="size" class="text-dark font-weight-medium mb-0 mr-3"><strong>Size</strong></label>
+        <select class="custom-select" id="size" required>
+            <option value="" disabled selected>Choose Size</option>
+            <!-- Options for sizes will be dynamically loaded here -->
+        </select>
+    </div>
+</div>
+
+
+        <div class="my-3">
+            <p>
+            <div class="input-group" style="width:150px">
+                    <button class="input-group-text bg-primary text-light" id="btnMinus" ><i class="fa fa-minus"></i></button>
+                    <input type="text" name="qty" id="txtQty" value="1" class="form-control text-center">
+                    <button class="input-group-text bg-primary text-light" id="btnPlus"><i class="fa fa-plus"></i></button>
+            </div>
+            </p>
+
+            <button type="submit" class="btn btn-primary" name="action" value="cart">
+            <i class="fa fa-shopping-cart"></i> Add to Cart
+            </button>
+
+          <button type="submit" class="btn btn-primary" name="action" value="wishlist">
+        <i class="fa fa-heart"></i> Add to Wishlist
+         </button>
+        </div>
+
+  </div></div>
+
+    <!-- Shop Detail End -->
+
+
+<!-- Products Start -->
+<div class="container-fluid py-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title px-5"><span class="px-2">You May Also Like</span></h2>
+    </div>
+    <div class="row">
+        {% if related_products %}
+        {% for related_product in related_products %}
+        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+            <div class="card product-item border-0 mb-4">
+                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                     <a href="{% url 'shop:product_detail' related_product.id %}">
+                    <img class="img-fluid w-100" src="{{ related_product.images.first.image.url }}" style="width:250px; height:250px;" alt="{{ product.product_name }}">
+                     </a></div>
+                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                    <h6 class="text-truncate mb-3"><strong>{{ related_product.product_name | title }}</strong></h6>
+                    <div class="d-flex justify-content-center">
+                        <h6>Rs. {{ related_product.price }}</h6>
+                    </div>
+                </div>
+               <div class="card-footer d-flex justify-content-center align-items-center bg-primary text-light border">
+
+                    <a href="{% url 'shop:product_detail' related_product.id %}" class="btn btn-sm text-dark">
+        <i class="fas fa-eye text-black mr-1"></i>&nbsp;View Detail
+    </a>
+  </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div>
+            <h2>No results found</h2>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+   // JavaScript code for handling color selection and loading available sizes
+   $(document).ready(function () {
+    $('#color').change(function () {
+        var selectedColorId = $(this).val();
+        var pid = $('#pid').val(); // Get the pid value
+        if (selectedColorId) {
+            // Make an AJAX request to get available sizes for the selected color and pid
+            $.get('{% url "shop:get_available_sizes" %}', { color_id: selectedColorId, pid: pid }, function (data) {
+                if (data.sizes) {
+                    var sizeSelect = $('#size');
+                    sizeSelect.empty(); // Clear existing options
+                    sizeSelect.append($('<option>', {
+                        value: '',
+                        text: 'Choose Size'
+                    }));
+                    // Add dynamically loaded size options
+                    $.each(data.sizes, function (sizeId, sizeName) {
+                        sizeSelect.append($('<option>', {
+                            value: sizeId,
+                            text: sizeName
+                        }));
+                    });
+                }
+            });
+        }
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function (event) {
+    function csrfSafeMethod(method) {
+        // These HTTP methods do not require CSRF protection
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    const commonForm = document.getElementById("commonForm");
+    const btnPlus = document.getElementById("btnPlus");
+    const btnMinus = document.getElementById("btnMinus");
+    const txtQty = document.getElementById("txtQty");
+    const pid = document.getElementById("pid");
+
+    const colorElement = document.getElementById("color");
+    const sizeElement = document.getElementById("size");
+
+
+
+    // Initialize variables to store selected color and size
+
+    // Initialize variables to store selected color and size
+    let selectedColorId = colorElement.value;
+    let selectedSizeId = sizeElement.value;
+
+    colorElement.addEventListener("change", function() {
+        // Update selected color when the dropdown changes
+        selectedColorId = colorElement.value;
+    });
+
+    sizeElement.addEventListener("change", function() {
+        // Update selected size when the dropdown changes
+        selectedSizeId = sizeElement.value;
+    });
+
+
+    commonForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const action = e.submitter.value;
+    console.log(action);
+    if (action === "cart") {
+        // Handle Add to Cart action
+        // Retrieve form elements and values
+        const qty = parseInt(txtQty.value, 10);
+
+        // Check if quantity is greater than 0
+        if (qty > 0) {
+            // Prepare data to send in the AJAX request
+            const postObj = {
+                product_qty: qty,
+                pid: pid.value,
+                color: selectedColorId,
+                size: selectedSizeId,
+            };
+
+            var urlcart = '{% url "cartapp:add_to_cart" %}';
+
+            fetch(urlcart, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(postObj)
+            })
+            .then(response => {
+                return response.json();
+            }).then(data => {
+                if (data['status'] === 'success') {
+                    alertify.success('Item added to cart successfully');
+                } else {
+                     alertify.success(data['status']);
+                }
+            });
+        } else {
+            alert("Please Enter The Quantity");
+        }
+    } else if (action === "wishlist") {
+        // Handle Add to Wishlist action
+        // Retrieve form elements and values
+        console.log('Action:', action);
+
+        const postObj = {
+            pid: pid.value,
+            color: selectedColorId,
+            size: selectedSizeId,
+        };
+        var urlWishlist = '{% url "cartapp:addToWishlist" %}';
+        console.log('URL:', urlWishlist);
+        console.log('Post Data:', postObj);
+        fetch(urlWishlist, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify(postObj)
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if (data['status'] === 'success') {
+                alertify.success('Item added to wishlist successfully');
+            } else {
+                 alertify.success(data['status']);
+            }
+        });
+    }
+});
+
+    btnPlus.addEventListener("click", function (e) {
+        let qty = parseInt(txtQty.value, 10);
+        qty = isNaN(qty) ? 0 : qty;
+
+        // Increment quantity and update input field
+        if (qty < 10) {
+            qty++;
+            txtQty.value = qty;
+        }
+    });
+
+    btnMinus.addEventListener("click", function () {
+        let qty = parseInt(txtQty.value, 10);
+        qty = isNaN(qty) ? 0 : qty;
+
+        //console.log(qty);
+        if (qty > 1) {
+            qty--;
+            txtQty.value = qty;
+        }
+    });
+});
+
+
+</script>
+
+{% endblock %}

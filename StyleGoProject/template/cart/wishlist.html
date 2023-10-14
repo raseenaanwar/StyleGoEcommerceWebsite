@@ -1,0 +1,86 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+    <!-- Wish list Start -->
+
+
+<div class="container-fluid pt-5">
+    {% if not wishlist_items %}
+        <h2 class="text-center">Your Wish list is empty</h2>
+    {% else %}
+    <div class="row col-lg-4 mx-auto">
+        {% include 'includes/alerts.html' %}
+    </div>
+
+        <div class="row px-xl-5">
+            <div class="col-lg-8 table-responsive mb-5">
+                <table class="table table-bordered text-center mb-0">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Products</th>
+                            <th>Image</th>
+                            <th>Price</th>
+                            <th>Remove</th>
+                            <th>Add To Cart</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        {% for wishlist_item in wishlist_items %}
+                            <tr>
+                                <td class="align-middle">
+                                    <b>{{ wishlist_item.product.product_name | title}}</b><br>
+                                    <span class="text-muted small">
+                                        <b>Color:</b>&nbsp;{{ wishlist_item.productvariant.color.color_name }}<br>
+                                        <b>Size:</b>&nbsp;{{ wishlist_item.productvariant.size.size_name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <img src="{{ wishlist_item.product.images.first.image.url }}" alt="" style="width: 50px;">
+                                </td>
+                                <td class="align-middle">Rs.{{ wishlist_item.product.price }}</td>
+                                <td>
+                                  <a href="{% url 'cartapp:remove_wishlist' wishlist_item.id %}" onclick="return confirmRemoveFromWishlist(event, '{{ wishlist_item.id }}')" class="btn btn-sm btn-primary">
+     <i class="fa fa-times"></i>
+                                    </a>
+                                </td>
+
+                                <form method="post" action="{% url 'cartapp:addcart_wishlist' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ wishlist_item.product.id }}">
+
+                                    <input type="hidden" name="color" value="{{ wishlist_item.productvariant.color.id }}">
+                                    <input type="hidden" name="size" value="{{wishlist_item.productvariant.size.id}}">
+    <td>
+        <button type="submit" class="btn btn-primary">Add to Cart</button></td>
+    </form>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<!-- Cart End -->
+
+<script>
+    function confirmRemoveFromWishlist(event, itemId) {
+        // Prevent the default behavior of the link
+        event.preventDefault();
+
+        // Show an Alertify confirmation dialog
+        alertify.confirm('Confirmation', 'Are you sure you want to remove this item from the wish list?',
+            function() {
+                // If the user clicks "OK," proceed to the actual removal by following the link
+              window.location.href = "{% url 'cartapp:remove_wishlist' 0 %}".replace('0', itemId);
+
+            },
+            function() {
+                // If the user clicks "Cancel," do nothing
+            }
+        );
+
+        // Return false to prevent the default behavior of the link
+        return false;
+    }
+</script>
+{% endblock %}

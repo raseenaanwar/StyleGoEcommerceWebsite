@@ -1,0 +1,185 @@
+{% extends 'admin/dashboard.html' %}
+{% load mathfilters %}
+
+{% block links %}
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+{% endblock links %}
+
+{% block content %}
+  {% include 'includes/alerts.html' %}
+
+  <div class="pagetitle">
+    <h1>Sales Report</h1>
+  </div>
+
+  <section class="section dashboard">
+    <div class="row">
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+          <!-- Recent Sales -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+              <div class="card-body">
+                <div class="container">
+                  <form method="post">
+                    {% csrf_token %}
+                    <div class="row justify-content-center">
+                      <div class="col-md-4">
+                        <label for="start-date">Start Date</label>
+                        <input type="date" id="start-date" name="start-date" class="form-control" value="{{ s_date }}">
+                      </div>
+                      <div class="col-md-4">
+                        <label for="end-date">End Date</label>
+                        <input type="date" id="end-date" name="end-date" class="form-control" value="{{ e_date }}">
+                      </div>
+                      <div class="col-md-4">
+                        <label for="report-type">Select Report Type</label>
+                        <select id="report-type" name="report-type" class="form-control">
+                          <option value="all">All Sales</option>
+                          <option value="product">Product-wise</option>
+                          <option value="category">Category-wise</option>
+                        </select>
+                      </div>
+                      <div class="col-md-12 d-flex justify-content-center p-3">
+    <button class="btn btn-danger btn-sm" type="submit">Generate Report</button>
+</div>
+
+                    </div>
+                  </form>
+                </div>
+
+                {% if sales %}
+                  <h2>All Sales</h2>
+                  <table class="table">
+                    <!-- Table headers -->
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                      </tr>
+                    </thead>
+                    <!-- Table body -->
+                    <tbody>
+                      {% for sale in sales %}
+                       {% with lower_status=sale.order.status|lower %}
+             {% if lower_status != 'cancelled' %}
+
+                          <tr>
+                            <td>{{ sale.order.order_number }}</td>
+                            <td>{{ sale.user }}</td>
+                            <td>
+                              {% for order_product in sale.order.orderproduct_set.all %}
+                                {{ order_product.product.product_name }}
+                                {% if not forloop.last %}, {% endif %}
+                              {% endfor %}
+                            </td>
+                            <td>{{ sale.created_at }}</td>
+                            <td>{{ sale.order.total_with_tax|floatformat:2 }}</td>
+                          </tr>
+                        {% endif %}
+   {% endwith %}
+{% endfor %}
+                    </tbody>
+                  </table>
+
+                  <!-- Display Total Sales -->
+                  <div class="text-center mt-4">
+                    <h4>Total Sales: {{ final_total|floatformat:2 }}</h4>
+                  </div>
+                {% endif %}
+
+                {% if category_sales %}
+                  <h2>Category-wise Sales</h2>
+                  <table class="table">
+                    <!-- Table headers -->
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Total Sales</th>
+                        <th>Total Products Sold</th>
+                      </tr>
+                    </thead>
+                    <!-- Table body -->
+                    <tbody>
+                      {% for entry in category_sales %}
+                        <tr>
+                          <td>{{ entry.product__category__category_name }}</td>
+                          <td>{{ entry.total_sales|floatformat:2 }}</td>
+                          <td>{{ entry.total_products }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                  <!-- Display Final Total -->
+                  <div class="text-center mt-4">
+                    <h4>Final Total: {{ final_total|floatformat:2 }}</h4>
+                  </div>
+                {% endif %}
+
+                {% if product_sales %}
+                  <!-- Display Product-wise Sales -->
+                  <h2>Product-wise Sales</h2>
+                  <table class="table">
+                    <!-- Table headers -->
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Total Sales</th>
+                        <th>Total Quantity</th>
+                      </tr>
+                    </thead>
+                    <!-- Table body -->
+                    <tbody>
+                      {% for entry in product_sales %}
+                        <tr>
+                          <td>{{ entry.product__product_name }}</td>
+                          <td>{{ entry.total_sales|floatformat:2 }}</td>
+                          <td>{{ entry.total_quantity }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <!-- Display Final Total for Products -->
+                  <div class="text-center mt-4">
+                    <h4>Final Total: {{ final_total|floatformat:2 }}</h4>
+                  </div>
+                {% endif %}
+
+                <script>
+                  const startDate = document.getElementById("start-date");
+                  const endDate = document.getElementById("end-date");
+
+                  endDate.addEventListener("change", function () {
+                    if (endDate.value < startDate.value) {
+                      alert("End date cannot be before start date.");
+                      endDate.value = '';
+                    }
+                  });
+                </script>
+
+              </div>
+            </div>
+          </div><!-- End Recent Sales -->
+
+        </div>
+      </div><!-- End Left side columns -->
+
+      <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+      <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+      <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+      <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+    </div>
+  </section>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+
+<section class="section-content padding-y bg">
+
+    {% include 'includes/alerts.html' %}
+    <div class="container">
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+            <main class="col-md-9" style="width: 80% !important; margin: 0 auto;">
+                <article class="card">
+                    <header class="card-header">
+                        <strong class="d-inline-block mr-3">Your Order History</strong>
+                    </header>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Order #</th>
+                                            <th scope="col">Billing Name</th>
+
+                                            <th scope="col">Order Total</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Payment Method</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <th scope="row">
+                                                <a href="{% url 'shop:order_detail' order.order_number %}">{{order.order_number}}</a>
+                                            </th>
+                                            <td>{{order.first_name}}</td>
+
+                                            <td>Rs.{{order.total_with_tax}}</td>
+                                            <td>{{ order.created_at|date:"d-m-y" }}</td>
+
+                                            <td>{{order.payment_method}}</td>
+                                            <td>{{order.status}}</td>
+
+                                            <td>
+                                                {% if order.can_be_canceled %}
+                                                    <form action="{% url 'shop:cancel_cod_order' order.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-primary">Cancel</button>
+                                                    </form>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                <a href="{% url 'orderapp:download_invoice' order.id %}?payment_id={{ order.payment.payment_id }}" class="btn btn-primary">
+                                                    <i class="fas fa-file-download"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!-- row.// -->
+                    </div> <!-- card-body .// -->
+                </article> <!-- order-group.// -->
+            </main>
+        </div> <!-- row.// -->
+    </div>
+
+</section>
+
+{% endblock %}

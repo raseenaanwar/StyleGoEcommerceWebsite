@@ -1,0 +1,145 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<section class="section-content padding-y bg">
+	<div class="container">
+
+		<!-- ============================ COMPONENT 1 ================================= -->
+		<h4 class="text-center mb-20">Review Your Order and Confirm </h4>
+		<div class="row">
+
+			<aside class="col-lg-8">
+				<div class="card">
+					<h5 class="card-header">Billing Address</h5>
+					<div class="card-body">
+						<p class="card-text mb-0">{{order.full_name}}</p>
+						<p class="card-text mb-0">{{order.full_address}}</p>
+						<p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+						<p class="card-text mb-0">{{order.country}}</p>
+						<p class="card-text mb-0">{{order.email}}</p>
+						<p class="card-text mb-0">{{order.contactno}}</p>
+
+
+					</div>
+				</div>
+				<div class="card">
+					<h5 class="card-header">Payment Method</h5>
+
+					<div class="card-body">
+						<p class="card-text">Cash On Delivery</p>
+
+					</div>
+
+
+				</div>
+				<div class="card">
+					<h5 class="card-header">Review Products</h5>
+					<div class="card-body">
+						<table class="table table-borderless table-shopping-cart">
+							<thead class="text-muted">
+								<tr class="small text-uppercase">
+									<th scope="col">Product</th>
+									<th scope="col" width="120">Quantity</th>
+									<th scope="col" width="120">Price</th>
+
+								</tr>
+							</thead>
+							<tbody>
+
+								{% for cart_item in cart_items %}
+								<tr>
+									<td>
+										<figure class="itemside align-items-center">
+											<div class="aside"><img src="{{ cart_item.product.images.first.image.url }}" class="mr-3" style="width: 50px;"></div>
+											<figcaption class="info">
+												<a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+												<p class="text-muted small">
+													 Color: {{ cart_item.color.color_name | capfirst }}<br>
+        Size: {{ cart_item.size.size_name | capfirst }}
+												</p>
+											</figcaption>
+										</figure>
+									</td>
+									<td>
+										<!-- col.// -->
+										<label for="">{{cart_item.quantity}}</label>
+									</td>
+									<td>
+
+										<div class="price-wrap">
+											<var class="price">Rs. {{ cart_item.sub_total }}</var>
+											<small class="text-muted"> Rs. {{ cart_item.product.calculate_offered_price|default:cart_item.product.price }} each </small>
+										</div> <!-- price-wrap .// -->
+									</td>
+
+								</tr>
+								{% endfor %}
+
+							</tbody>
+						</table>
+
+
+					</div>
+				</div>
+
+			</aside> <!-- col.// -->
+
+		 <aside class="col-lg-4">
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <td>Total price:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ total }}</td>
+                </tr>
+                <tr>
+                    <td>Shipping Charge:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ shipping_charge }}</td>
+                </tr>
+				<tr>
+                    <td>Tax</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.tax_amount }}</td>
+                </tr>
+				<tr>
+				{% if cart.coupon %}
+					<td>Coupon Discount:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ coupon_discount }}</td>
+				{% endif %}
+				</tr>
+
+				{% if wallet_amount_present %}
+				<tr>
+					<td>Wallet Amount Used:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.wallet_amount_used }}</td>
+				</tr>
+				<tr>
+					<td>Extra amount to pay:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.extra_paid }}</td>
+				</tr>
+				{% else %}
+                <tr>
+                    <td>Grand Total:</td>
+                    <td class="text-right text-dark b" style="text-align: right; padding-right: 20px;"><strong>Rs.{{ order.total_with_tax }}</strong></td>
+                </tr>
+				{% endif %}
+            </table>
+			<div class="text-right">
+                <a href="{% url 'orderapp:confirm_order' order.id %}" class="btn btn-primary">Confirm Order</a>
+                <a href="{% url 'cartapp:cart' %}" class="btn btn-secondary">Back to Cart</a>
+            </div>
+
+        </div> <!-- card-body.// -->
+    </div>
+</aside> <!-- col.// -->
+		</div> <!-- row.// -->
+
+		<!-- ============================ COMPONENT 1 END .// ================================= -->
+
+	</div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

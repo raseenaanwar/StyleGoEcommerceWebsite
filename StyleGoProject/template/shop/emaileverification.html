@@ -1,0 +1,13 @@
+{% autoescape off %}
+Hi User,
+
+Please clock on below link to confirm your registration.
+
+http://{{domain}}{% url 'shop:activate' uidb64=uid token=token %}
+
+If you think it's not you , please ignore this mail
+
+Best Regards,
+
+StyleGo Team
+{% endautoescape %}

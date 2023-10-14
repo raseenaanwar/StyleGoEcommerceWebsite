@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f1f1;
+        }
+
+        .container {
+            margin: 0 auto;
+            width: 50%;
+            padding: 50px;
+            background: #fff;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .invoice-logo img {
+            max-height: 40px;
+        }
+
+        .invoice-from ul {
+            list-style: none;
+            padding: 0;
+            text-align: right;
+        }
+
+        .invoice-details .well {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .table-bordered {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .invoice-footer {
+            margin-top: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="card-body">
+
+                <div style="border: 1px solid black; padding: 10px; background-color: rgb(255, 207, 196); text-align: center;">
+                    <h1>Total Sales: Rs {{ final_total }}</h1>
+                </div>
+
+                <div><h2>Sales by Category</h2> </div>
+                    <div style="border: 1px solid black; padding: 10px; ">
+                        <table style="border-collapse: collapse; width: 100%; background-color:rgb(211, 227, 227)">
+                            <tr style=" background-color:rgb(141, 166, 166)">
+                                <th style="border: 1px solid black; padding: 8px;">Category</th>
+                                <th style="border: 1px solid black; padding: 8px;">Total Sales</th>
+                                <th style="border: 1px solid black; padding: 8px;">Total Products Sold</th>
+                            </tr>
+                            {% for entry in category_sales %}
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">{{ entry.product__category__category_name }}</td>
+                                <td style="border: 1px solid black; padding: 8px;">Rs {{ entry.total_sales|floatformat:2 }}</td>
+                                <td style="border: 1px solid black; padding: 8px;"> {{ entry.total_products }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+
+                    <h2>Sales by Product</h2>
+                    <div style="border: 1px solid black; padding: 10px;">
+                        <table style="border-collapse: collapse; width: 100%; background-color: blanchedalmond;">
+                            <tr style="background-color: rgb(216, 199, 173);">
+                                <th style="border: 1px solid black; padding: 8px;">Product</th>
+                                <th style="border: 1px solid black; padding: 8px;">Total Sales</th>
+                                <th style="border: 1px solid black; padding: 8px;">Total Quantity</th>
+                            </tr>
+                            {% for entry in product_sales %}
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">{{ entry.product__product_name  }}</td>
+                                <td style="border: 1px solid black; padding: 8px;">Rs {{ entry.total_sales|floatformat:2}}</td>
+                                <td style="border: 1px solid black; padding: 8px;"> {{ entry.total_quantity}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+<!--                    </div>-->
+
+                    <div class="text-center">
+                        <h2>Order Details:</h2>
+                        <table style="border-collapse: collapse; width: 100%; background-color: rgb(173, 231, 233);">
+                            <tr style="background-color: rgb(134, 181, 183);;">
+                                <th style="border: 1px solid black; padding: 8px;">Order ID</th>
+                                <th style="border: 1px solid black; padding: 8px;">Customer Name</th>
+                                <th style="border: 1px solid black; padding: 8px;">Product</th>
+                                <th style="border: 1px solid black; padding: 8px;">Order Date</th>
+                                <th style="border: 1px solid black; padding: 8px;">Price</th>
+                            </tr>
+                            {% for order_item  in order_items %}
+                            {% if order_item.order.is_ordered %}
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">{{ order_item.order.order_number }}</td>
+                                <td style="border: 1px solid black; padding: 8px;">{{ order_item.user }}</td>
+                                <td style="border: 1px solid black; padding: 8px;">{% for order_product in order_item.order.orderproduct_set.all %}
+                                {{ order_product.product.product_name }}
+                                {% if not forloop.last %}, {% endif %}
+                              {% endfor %}</td>
+                                <td style="border: 1px solid black; padding: 8px;">{{ order_item.created_at }}</td>
+                                <td style="border: 1px solid black; padding: 8px;">{{ order_item.order.total_with_tax|floatformat:2  }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+             </div>
+</body>
+</html>

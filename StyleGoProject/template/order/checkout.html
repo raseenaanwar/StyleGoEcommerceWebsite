@@ -1,0 +1,310 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block content %}
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Checkout</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Checkout</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-8 ">
+           <h1 class="font-weight-semi-bold mb-4  text-center ">Checkout Page</h1>
+        </div>
+
+        <div class="col-lg-4 pt-5">
+            <!-- Coupon form -->
+            <div class="col-lg-12">
+                {% include 'includes/alerts.html' %}
+
+                <form id="coupon-form" action="{% url 'cartapp:apply_coupon' cart.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control p-4" placeholder="Coupon Code" name="coupon">
+                        <div class="input-group-append ml-auto">
+                            <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                        </div>
+                    </div>
+                          {% if cart.coupon %}
+                        <a href="{% url 'cartapp:remove_coupon' cart.id %}" class="btn btn-primary">{{cart.coupon.coupon_code}}</a>
+                    {% endif %}
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8" style="max-height: 400px; overflow: auto;">
+                <h4 class="font-weight-semi-bold mb-4">Billing Address</h4>
+                <form id="checkout-form" action="{% url 'orderapp:place_order' %}" method="POST" onsubmit="return validateForm();">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'cartapp:cart' %}">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>First Name</label>
+                            <input class="form-control" type="text" name='first_name' value='{{ user.first_name }}' placeholder="John" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Last Name</label>
+                            <input class="form-control" type="text" name='last_name' value='{{ user.last_name }}' placeholder="Doe">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>E-mail</label>
+                            <input class="form-control" type="text" name='email' value='{{ user.email }}' placeholder="example@email.com">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Mobile No</label>
+                            <input class="form-control" type="text" name='contactno' value='{{ user.contactno }}' placeholder="+123 456 789">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Address Line 1</label>
+                            <input class="form-control" type="text" name='address_line_1' value='{{ userprofile.address_line_1 }}' placeholder="123 Street">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Address Line 2</label>
+                            <input class="form-control" type="text" name='address_line_2' value='{{ userprofile.address_line_2 }}' placeholder="123 Street">
+                        </div>
+                         <div class="col-md-6 form-group">
+                            <label>Country</label>
+                            <input class="form-control" type="text" name='country' value='{{ userprofile.country }}' placeholder="India">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>City</label>
+                            <input class="form-control" type="text" name='city' value='{{ userprofile.city }}' placeholder="New York">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>State</label>
+                            <input class="form-control" type="text" name='state' value='{{ userprofile.state }}' placeholder="New York">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ZIP Code</label>
+                            <input class="form-control" type="text" name='pincode' value='{{ userprofile.pincode }}' placeholder="123">
+                        </div>
+                    </div>
+                        <div class="col-md-12 form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="shipto">
+                                <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
+                            </div>
+                        </div>
+                        <!-- Shipping address form (initially hidden) -->
+<div id="shipping-address" style="display: none;">
+   <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>First Name</label>
+                            <input class="form-control" type="text" name='shipping_first_name'  placeholder="John" >
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Last Name</label>
+                            <input class="form-control" type="text" name='shipping_last_name'  placeholder="Doe">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>E-mail</label>
+                            <input class="form-control" type="text" name='shipping_email' placeholder="example@email.com">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Mobile No</label>
+                            <input class="form-control" type="text" name='shipping_contactno'  placeholder="+123 456 789">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Address Line 1</label>
+                            <input class="form-control" type="text" name='shipping_address_line_1'  placeholder="123 Street">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Address Line 2</label>
+                            <input class="form-control" type="text" name='shipping_address_line_2' placeholder="123 Street">
+                        </div>
+                         <div class="col-md-6 form-group">
+                            <label>Country</label>
+                            <input class="form-control" type="text" name='shipping_country'  placeholder="India">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>City</label>
+                            <input class="form-control" type="text" name='shipping_city'  placeholder="New York">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>State</label>
+                            <input class="form-control" type="text" name='shipping_state'  placeholder="New York">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ZIP Code</label>
+                            <input class="form-control" type="text" name='shipping_pincode'  placeholder="123">
+                        </div>
+                    </div>
+</div>
+
+                </div>
+
+<br> <br>
+            <div class="col-lg-4">
+
+
+    <div class="card border-secondary mb-5">
+        <div class="card-header bg-secondary border-0">
+            <h4 class="font-weight-semi-bold m-0">Order Total</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="font-weight-medium mb-3">Products</h5>
+            {% for cart_item in cart_items %}
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'shop:product_detail' cart_item.product.id %}">
+                    <img src="{{ cart_item.product.images.first.image.url }}" alt="Product Image" class="mr-3" style="width: 50px;">
+                    </a>
+                    <div>
+                        <h6 class="font-weight-medium mb-0">{{ cart_item.product.product_name | title}}</h6>
+                        <p class="text-muted small mb-0">
+                            Color: {{ cart_item.color.color_name | capfirst }}<br>
+        Size: {{ cart_item.size.size_name | capfirst }}
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <p class="mb-1">Quantity: {{ cart_item.quantity }}</p>
+                    <p class="mb-1">Price: Rs.{{ cart_item.product.calculate_offered_price|default:cart_item.product.price }}</p>
+                    <p class="mb-0">Total: Rs.{{ cart_item.sub_total }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            <hr class="mt-3">
+            <div class="d-flex justify-content-between mb-3 pt-1">
+                <h6 class="font-weight-medium">Subtotal</h6>
+                <h6 class="font-weight-medium">{{ total }}</h6>
+            </div>
+            <div class="d-flex justify-content-between mb-3 pt-1">
+                <h6 class="font-weight-medium">Shipping Charge</h6>
+                <h6 class="font-weight-medium">Rs.{{ shipping_charge }}</h6>
+            </div>
+            <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium ">Tax </h6>
+                            <h6 class="font-weight-medium">Rs.{{tax_amount}}</h6>
+            </div>
+<!--            <hr class="mt-3">-->
+            {% if cart.coupon %}
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Coupon Discount</h6>
+                            <h6 class="font-weight-medium">Rs.{{coupon_discount}}</h6>
+                        </div>
+            {% endif %}
+        </div>
+
+
+        {% if user.wallet.balance > 0 %}
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Wallet Balance</h6>
+                            <h6 class="font-weight-medium">Rs.{{user.wallet.balance}}</h6>
+                        </div>
+
+        {% endif %}
+
+{% if cart.is_wallet_used %}
+        <div class="card-footer border-secondary bg-transparent">
+    <div class="d-flex justify-content-between mb-3 pt-1">
+        <h6>Balance After wallet to pay</h6>
+        <!-- Assuming grand_total is the order amount -->
+        <h6>Rs.{{ balance_after_wallet }}</h6>
+    </div>
+</div>
+
+{% else %}
+
+
+        <div class="card-footer border-secondary bg-transparent">
+            <div class="d-flex justify-content-between ">
+                <h6 >Grand Total</h6>
+                <h6 >Rs.{{total_with_tax}}</h6>
+            </div>
+        </div>
+
+        {% endif %}
+    </div></div>
+</div>
+
+<div class="row justify-content-end mx-auto">
+<div class="col-lg-4" style="position: sticky; top: 0;">
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Payment</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment-method" id="paypal" value="paypal">
+                                <label class="custom-control-label" for="paypal">Paypal</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment-method" id="cod" value="cod">
+                                <label class="custom-control-label" for="cod">Cash On Delivery</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer border-secondary bg-transparent">
+                        <button type="submit" name="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
+                    </div>
+                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Checkout End -->
+</div></div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var shiptoCheckbox = document.getElementById("shipto");
+        shiptoCheckbox.addEventListener("change", toggleShippingAddress);
+    });
+
+    function toggleShippingAddress() {
+        var shippingAddress = document.getElementById("shipping-address");
+
+        // Toggle the visibility of the shipping address form based on the checkbox state
+        shippingAddress.style.display = this.checked ? "block" : "none";
+    }
+    function validateForm() {
+        var paymentMethod = document.querySelector('input[name="payment-method"]:checked');
+        var shiptoCheckbox = document.getElementById("shipto");
+
+        console.log("Payment Method:", paymentMethod);
+        console.log("Ship to Different Address Checked:", shiptoCheckbox.checked);
+
+        if (shiptoCheckbox.checked) {
+            // Additional validation for shipping to a different address
+            // Check if the shipping address fields are filled out
+            var shippingAddressFields = document.querySelectorAll('#shipping-address input');
+            for (var i = 0; i < shippingAddressFields.length; i++) {
+                if (!shippingAddressFields[i].value.trim()) {
+<!--                    alert("Please fill out all shipping address fields.");-->
+alertify.error("Please fill out all shipping address fields.", "error", 5);
+
+                    return false; // Prevent form submission
+                }
+            }
+        }
+
+        if (!paymentMethod) {
+            alertify.error("Please select a payment method before placing the order.");
+            return false; // Prevent form submission
+        }
+
+        return true; // Allow form submission
+    }
+
+</script>
+
+
+{% endblock %}

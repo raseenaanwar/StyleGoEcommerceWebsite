@@ -1,0 +1,216 @@
+{% extends 'shop/base.html' %}
+<!-- Shop Start -->
+{% block content %}
+ <div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 250px">
+        {% if 'search' in request.path %}
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Search Result</h1>
+        {% else %}
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Our Shop</h1>
+        {% endif %}
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{% url 'shop:home' %}">Home</a></p>
+        </div>
+    </div>
+</div></div>
+        <div class=" container-fluid pt-5">
+        <div class="row px-xl-5">
+            <!-- Shop Start -->
+        <!-- Shop Sidebar Start -->
+        <div class="col-lg-3 col-md-12">
+            <!-- Price Start -->
+<div class="border-bottom mb-4 pb-4">
+    <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
+    <form method="post" action="{% url 'shop:shop_product' %}">
+    {% csrf_token %}
+    {% for price_range, count in price_ranges %}
+        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+            <input type="checkbox" class="custom-control-input" id="price-{{ forloop.counter }}" name="price" value="{{ price_range.0 }},{{ price_range.1 }}" {% if price_range|join:',' in selected_price_ranges %}checked{% endif %}>
+            <label class="custom-control-label" for="price-{{ forloop.counter }}">Rs {{ price_range.0 }} - Rs {{ price_range.1 }}</label>
+            <span class="badge border font-weight-normal">{{ count.count }}</span>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+</form>
+           </div>
+
+            <!-- Price End -->
+<form method="post" action="{% url 'shop:shop_product' %}">
+    {% csrf_token %}
+    <div class="border-bottom mb-4 pb-4">
+        <h5 class="font-weight-semi-bold mb-4">Filter by color</h5>
+        {% for color_choice, count in color_choices %}
+            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                <input type="checkbox" class="custom-control-input" id="color-{{ color_choice }}" name="color" value="{{ color_choice }}" {% if color_choice in selected_colors %}checked{% endif %}>
+                <label class="custom-control-label" for="color-{{ color_choice }}">{{ color_choice }}</label>
+                <span class="badge border font-weight-normal">{{ count }}</span>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Apply Color Filters</button>
+    </div>
+</form>
+           <!-- Size Start -->
+<form method="post" action="{% url 'shop:shop_product' %}">
+    {% csrf_token %}
+    <div class="mb-5">
+        <h5 class="font-weight-semi-bold mb-4">Filter by size</h5>
+
+
+        {% for size_choice, count in size_choices %}
+            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                <input type="checkbox" class="custom-control-input" id="size-{{ size_choice }}" name="size" value="{{ size_choice }}" {% if size_choice in selected_sizes %}checked{% endif %}>
+                <label class="custom-control-label" for="size-{{ size_choice }}">{{ size_choice }}</label>
+                <span class="badge border font-weight-normal">{{ count }}</span>
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Apply Size Filters</button>
+    </div>
+</form>
+
+            <!-- Size End -->
+        </div>
+
+
+            <!-- Shop Product Start -->
+            <div class="col-lg-9 col-md-12">
+                <div class="row pb-3">
+                    <div class="col-12 pb-1">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+
+
+           <div class="dropdown ml-4">
+    <button class="btn border dropdown-toggle" type="button" id="triggerId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Sort by
+    </button>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="triggerId">
+        <a class="dropdown-item {% if selected_sort == 'latest' %}active{% endif %}" href="{% url 'shop:shop_product' %}?sort=latest">Latest</a>
+        <a class="dropdown-item {% if selected_sort == 'price' %}active{% endif %}" href="{% url 'shop:shop_product' %}?sort=price">Price</a>
+    </div>
+</div>
+
+<!-- Display the selected sort option -->
+<p>Sorted by: {{ selected_sort }}</p>
+        </div>
+    </div>
+ {% if filtered_products %}
+                    {% for product in filtered_products %}
+        <div class="col-lg-4 col-md-6 col-sm-12 pb-1 product-item">
+            <div class="card product-item border-0 mb-4">
+                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                    <a href="{% url 'shop:product_detail' product.id %}">
+                        <img class="img-fluid w-100" src="{{ product.images.first.image.url }}" style="width:250px; height:250px;" alt="{{ product.product_name }}">
+                    </a>
+                </div>
+                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                    <h6 class="text-truncate mb-3"><strong>{{ product.product_name | title }}</strong></h6>
+                    {% with offered_price=product.calculate_offered_price %}
+                            {% if product.price > offered_price %}
+                            <h6>
+                            <span style="text-decoration: line-through;">Rs.{{product.price}}</span>
+  &nbsp;&nbsp;&nbsp;
+                         Rs. {{ offered_price }}
+                        </h6>
+                        {% else %}
+                        <h6> Rs. {{ product.price }}</h6>
+                        {% endif %}
+
+                    {% endwith %}
+                </div>
+                <div class="d-flex justify-content-center align-items-center">
+                    <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-sm btn-primary mx-auto"><i class="fas fa-eye text-white mr-1"></i> View Detail</a>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+
+{% elif products %}
+    {% for product in products %}
+        <div class="col-lg-4 col-md-6 col-sm-12 pb-1 product-item">
+            <div class="card product-item border-0 mb-4">
+                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                    <a href="{% url 'shop:product_detail' product.id %}">
+                        <img class="img-fluid w-100" src="{{ product.images.first.image.url }}" style="width:250px; height:250px;" alt="{{ product.product_name }}">
+                    </a>
+                </div>
+                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                    <h6 class="text-truncate mb-3"><strong>{{ product.product_name | title }}</strong></h6>
+                    {% with offered_price=product.calculate_offered_price %}
+                            {% if product.price > offered_price %}
+                            <h6>
+                            <span style="text-decoration: line-through;">Rs.{{product.price}}</span>
+  &nbsp;&nbsp;&nbsp;
+                         Rs. {{ offered_price }}
+                        </h6>
+                        {% else %}
+                        <h6> Rs. {{ product.price }}</h6>
+                        {% endif %}
+
+                    {% endwith %}
+                </div>
+                <div class="d-flex justify-content-center align-items-center">
+                    <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-sm btn-primary mx-auto"><i class="fas fa-eye text-white mr-1"></i> View Detail</a>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div>
+        <h2>No result found</h2>
+    </div>
+{% endif %}
+    </div>
+<br><br>
+                   <div class="col-12 pb-1">
+    <nav aria-label="Page navigation">
+        {% if products.has_other_pages %}
+        <ul class="pagination justify-content-center mb-3 custom-pagination">
+            {% if products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">&laquo;</span>
+            </li>
+            {% endif %}
+
+            {% for page_num in products.paginator.page_range %}
+            <li class="page-item {% if products.number == page_num %}active{% endif %}">
+                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Next">&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </nav>
+</div>
+
+
+            </div>
+            <!-- Shop Product End -->
+        </div>
+    </div></div>
+    <!-- Shop End -->
+
+
+    {% endblock %}

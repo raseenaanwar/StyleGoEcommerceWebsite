@@ -1,0 +1,92 @@
+
+{% extends 'shop/base.html' %}
+{% block title %}
+  Signup
+{% endblock %}
+
+{% block content %}
+
+<section class="vh-100 gradient-custom">
+  <div class="container py-5 h-100">
+    <div class="row justify-content-center align-items-center h-100">
+      <div class="col-12 col-lg-9 col-xl-7">
+        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+          <div class="card-body p-4 p-md-5">
+            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Registration Form</h3>
+            {% include 'includes/alerts.html' %}
+            <form action='' method="post" >
+            {% csrf_token %}
+                <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <input type="text" id="firstName" class="form-control form-control-lg" name="user_name" required/>
+                    <label class="form-label" for="firstName">User Name</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                        <input type="text" id="for1m3Example2c" class="form-control" name="first_name" required/>
+                          <label class="form-label" for="for1m3Example2c">FirstName</label>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-4 ">
+                  <div class="form-outline">
+                     <input type="text" id="form3Example91c" class="form-control" name="last_name" required/>
+                          <label class="form-label" for="form3Example91c">LastName</label></div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                     <input type="email" id="form13Example3c" class="form-control" name="email" required/>
+                          <label class="form-label" for="form13Example3c">Your Email</label>
+                  </div>
+                    </div>
+              </div>
+                  <div class="row">
+                <div class="col-md-6 mb-4 ">
+                <div class="form-outline">
+                    <input type="number" id="form311Example5c" class="form-control" name="contactno" required/>
+                          <label class="form-label" for="form311Example5c">Your Mobile Number</label>
+                </div>
+                </div>
+                       <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <input type="password" id="form3Ex1ample4c" class="form-control" name="password1" required/>
+                          <label class="form-label" for="form3Ex1ample4c">Password</label></div>
+
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-4 pb-2">
+
+                  <div class="form-outline">
+                    <input type="password" id="form3Example4cd1" class="form-control" name="password2" required/>
+                          <label class="form-label" for="form3Example4cd1">Repeat your password</label> </div>
+
+                </div>
+
+                </div>
+
+
+
+<div class="mt-4 pt-2 d-flex justify-content-between">
+    <a href="{% url 'shop:login' %}" class="text-muted">Already have an account?</a>
+    <button type="submit" class="btn btn-primary btn-lg">Register</button>
+</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!--{% endblock %}-->

@@ -1,0 +1,232 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+	<div class="container">
+		<h4 class="text-center mb-20">Review Your Order </h4>
+		<div class="row">
+
+			<aside class="col-lg-8">
+				<div class="card">
+					<h5 class="card-header">Billing Address</h5>
+					<div class="card-body">
+						<p class="card-text mb-0">{{order.full_name}}</p>
+						<p class="card-text mb-0">{{order.full_address}}</p>
+						<p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+						<p class="card-text mb-0">{{order.country}}</p>
+						<p class="card-text mb-0">{{order.email}}</p>
+						<p class="card-text mb-0">{{order.contactno}}</p>
+
+
+					</div>
+				</div>
+<!--				<div class="card">-->
+<!--    {{ order.extra_paid }}-->
+<!--    <h5 class="card-header">Payment Method</h5>-->
+<!--    {% if order.extra_paid|floatformat:2 > 0 %}-->
+<!--        <div class="card-body">-->
+<!--            <p class="card-text">Paypal</p>-->
+<!--        </div>-->
+<!--    {% else %}-->
+<!--        <div class="card-body">-->
+<!--            <p class="card-text">Only used wallet</p>-->
+<!--        </div>-->
+<!--    {% endif %}-->
+<!--</div>-->
+
+				<div class="card">
+					<h5 class="card-header">Review Products</h5>
+					<div class="card-body">
+						<table class="table table-borderless table-shopping-cart">
+							<thead class="text-muted">
+								<tr class="small text-uppercase">
+									<th scope="col">Product</th>
+									<th scope="col" width="120">Quantity</th>
+									<th scope="col" width="120">Price</th>
+
+								</tr>
+							</thead>
+							<tbody>
+
+								{% for cart_item in cart_items %}
+								<tr>
+									<td>
+										<figure class="itemside align-items-center">
+											<div class="aside"><img src="{{ cart_item.product.images.first.image.url }}"class="mr-3" style="width: 50px;"></div>
+											<figcaption class="info">
+												<a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+												<p class="text-muted small">
+													 Color: {{ cart_item.color.color_name | capfirst }}<br>
+        Size: {{ cart_item.size.size_name | capfirst }}
+												</p>
+											</figcaption>
+										</figure>
+									</td>
+									<td>
+										<!-- col.// -->
+										<label for="quantity">{{cart_item.quantity}}</label>
+									</td>
+									<td>
+										<div class="price-wrap">
+											<var class="price">Rs. {{ cart_item.sub_total }}</var>
+											<small class="text-muted"> Rs. {{ cart_item.product.calculate_offered_price|default:cart_item.product.price }} each </small>
+										</div> <!-- price-wrap .// -->
+									</td>
+
+								</tr>
+								{% endfor %}
+
+							</tbody>
+						</table>
+
+
+					</div>
+				</div>
+
+			</aside> <!-- col.// -->
+<aside class="col-lg-4">
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <td>Total price:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ total }}</td>
+                </tr>
+                <tr>
+                    <td>Shipping Charge:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ shipping_charge }}</td>
+                </tr>
+				 <tr>
+                    <td>Tax</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.tax_amount  }}</td>
+                </tr>
+				<tr>
+				{% if cart.coupon %}
+					<td>Coupon Discount:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ coupon_discount }}</td>
+				{% endif %}
+				</tr>
+
+				{% if wallet_amount_present %}
+				<tr>
+					<td>Wallet Amount Used:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.wallet_amount_used }}</td>
+				</tr>
+				<tr>
+					<td>Extra amount to pay:</td>
+                    <td style="text-align: right; padding-right: 20px;">Rs.{{ order.extra_paid }}</td>
+				</tr>
+				{% else %}
+                <tr>
+                    <td>Grand Total:</td>
+                    <td class="text-right text-dark b" style="text-align: right; padding-right: 20px;"><strong>Rs.{{ order.total_with_tax }}</strong></td>
+                </tr>
+				{% endif %}
+            </table>
+
+			{% if grand_total != 0 %}
+			<div class="text-right">
+                 <div id="paypal-button-container">
+
+				 </div>
+				<a href="{% url 'cartapp:cart' %}" class="btn btn-secondary">Back to Cart</a>
+				{% else %}
+                <div class="text-right">
+                <a href="{% url 'orderapp:confirm_order' order.id %}" class="btn btn-primary">Confirm Order</a>
+                <a href="{% url 'cartapp:cart' %}" class="btn btn-secondary">Back to Cart</a>
+            </div>
+				{% endif %}
+            </div>
+
+        </div> <!-- card-body.// -->
+    </div>
+</aside> <!-- col.// -->
+		</div> <!-- row.// -->
+
+
+
+	</div> <!-- container .//  -->
+</section>
+<script src="https://www.paypal.com/sdk/js?client-id=AZy5AfM9RLuPQyUQvScXqLJkyasLKU-mQS8Ir4mMTOBcmGBg2uGrTLuZQK6hlqxBGs0SG3B1a-elGLdl&currency=USD"></script>
+   <script>
+
+	function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+	var amount = "{{ grand_total }}"
+	var csrftoken = getCookie('csrftoken');
+	var orderID = "{{order.order_number}}"
+	var url = "{% url 'orderapp:paypal_payments' %}";
+	var payment_method = 'PayPal'
+	var redirect_url = "{% url 'orderapp:paypal_order_complete' %}"
+	// Render the PayPal button into #paypal-button-container
+	paypal.Buttons({
+
+		style: {
+			color: 'blue',
+			shape: 'rect',
+			label: 'pay',
+			height: 40
+		},
+
+		// Set up the transaction
+		createOrder: function(data, actions) {
+		   var inrAmount=amount;
+		   var exchangeRate=0.012;
+		   var usdAmount=inrAmount * exchangeRate;
+			return actions.order.create({
+				purchase_units: [{
+					amount: {
+						value: usdAmount.toFixed(2),
+					}
+				}]
+			});
+		},
+
+		// Finalize the transaction
+		onApprove: function(data, actions) {
+			return actions.order.capture().then(function(details) {
+				// Show a success message to the buyer
+				console.log(details);
+				sendData();
+				function sendData(){
+					fetch(url, {
+						method : "POST",
+						headers: {
+							"Content-type": "application/json",
+							"X-CSRFToken": csrftoken,
+						},
+						body: JSON.stringify({
+							orderID: orderID,
+							transID: details.id,
+							payment_method: payment_method,
+							status: details.status,
+						}),
+					})
+				  .then((response) => response.json())
+				  .then((data) => {
+						window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
+					});
+				}
+			});
+		}
+
+
+	}).render('#paypal-button-container');
+</script>
+
+
+{% endblock %}

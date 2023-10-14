@@ -1,0 +1,183 @@
+
+{% extends 'admin/dashboard.html' %}
+<head>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+{% block content %}
+<div class="container">
+  <div style="background-color:#FFFFF0;" class="container">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div style="background-color:#FFFFF0;" class="card-body">
+          {% comment %} <h4 class="card-title">Striped Table</h4> {% endcomment %}
+          {% comment %} <p class="card-description">
+            Add class <code>.table-striped</code>
+          </p> {% endcomment %}
+          <div class="row">
+                    <div class="col-sm-6">
+						<h2>Manage <b>Coupons</b></h2>
+					</div>
+          <div class="col-sm-6">
+						<a href="#addProductModal" class="btn btn-success" data-toggle="modal"></i> <span>Add New Coupon</span></a>
+
+					</div>
+
+          <div style="background-color:#FFFFF0;" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Coupon Code</th>
+					<th>Discount Price</th>
+                  <th>Minimum Amount</th>
+                  <th>Created At</th>
+                    <th>Updated At</th>
+					<th>is Available</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for coupon in coupons  %}
+                <tr>
+                  <td>{{coupon.coupon_code}}</td>
+                  <td>{{coupon.discount_price}}</td>
+					<td>{{coupon.minimum_amount}}</td>
+                    <td>{{coupon.created_at}}</td>
+                    <td>{{coupon.updated_at}}</td>
+					<td>
+            {% if coupon.is_available %}
+                 Available
+            {% else %}
+                 Not Available
+            {% endif %}
+        </td>
+					<td>
+                  {% if coupon.is_available %}
+                    <a href="{% url 'customadminapp:blockcoupon' coupon.id %}" class="btn btn-warning btn-sm">Block</a>
+                    {% else %}
+
+                    <a href="{% url 'customadminapp:unblockcoupon' coupon.id %}" class="btn btn-success btn-sm">Unblock</a>
+                    {% endif %}
+                </td>
+                  <td>
+			<a href="#editProductModal-{{ forloop.counter }}" class="btn btn-primary" data-toggle="modal">Edit</a>
+<!--            <a href="#deleteProductModal-{{ forloop.counter }}" class="btn btn-danger" data-toggle="modal">Block</a>-->
+         </td>
+				  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          </div>
+
+          	<!-- add Modal HTML -->
+	<div id="addProductModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="{% url 'customadminapp:add_coupon' %}" method="post" >
+					{% csrf_token %}
+					<div class="modal-header">
+						<h4 class="modal-title">Add Coupon</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Coupon Code</label>
+							<input type="text" name="coupon_code" class="form-control" required placeholder="Coupon code">
+						</div>
+                      <div class="form-group">
+                        <label>Is Available</label>
+                        <input type="checkbox" name="is_available" class="form-check-input">
+                        </div>
+
+						<div class="form-group">
+							<label>Discount Price</label>
+							<input type="text" name="discount_price" class="form-control"  placeholder="Discount Price" required>
+						</div>
+						<div class="form-group">
+							<label>Minimum Amount</label>
+							<input type="text" name="minimum_amount" class="form-control"  placeholder="Minimum Amount" required>
+						</div>
+                          <div class="form-group">
+
+						<label>Created At</label>
+                  	<input type="date" name="created_at" class="form-control" value="{{ today_date|date:'Y-m-d' }}" required>
+                  	</div>
+
+
+                  <div class="form-group">
+                  <label>Updated at</label>
+                  <input type="date" name="updated_at" class="form-control"  value="{{ today_date|date:'Y-m-d' }}" >
+                  </div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-success" value="Add">
+					</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+			{% if error %}
+<div class="container">
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+</div>
+{% endif %}
+<!-- Edit Modal HTML -->
+	{% for i in coupons %}
+	<div id="editProductModal-{{ forloop.counter }}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+			<form action="{% url 'customadminapp:update_coupon' i.id %}" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+					<div class="modal-header">
+						<h4 class="modal-title">Edit Coupon</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Coupon code</label>
+							<input type="text" name="coupon_code" value="{{i.coupon_code}}" class="form-control" required>
+						</div>
+                        <div class="form-group">
+                        <label>Is Available</label>
+                         <input type="checkbox" name="is_available" {% if  i.is_available %}checked{% endif %} class="form-check-input">
+                        </div>
+
+                        <div class="form-group">
+							<label>Discount Price</label>
+							<input type="text" name="discount_price" value="{{i.discount_price}}" class="form-control" required>
+						</div>
+                        <div class="form-group">
+							<label>Minimum Amount</label>
+							<input type="text" name="minimum_amount" value="{{i.minimum_amount}}" class="form-control" required>
+						</div>
+
+                    <div class="form-group">
+                        <label>Created Date</label>
+                        <input type="date" name="created_at" value="{{ i.created_at|date:'Y-m-d' }}" class="form-control" required>
+                    </div>
+
+<div class="form-group">
+    <label>Updated Date</label>
+    <input type="date" name="updated_at" value="{{ i.updated_at|date:'Y-m-d' }}" class="form-control" required>
+</div>
+
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-info" value="Update">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+
+
+
+{% endblock %}
