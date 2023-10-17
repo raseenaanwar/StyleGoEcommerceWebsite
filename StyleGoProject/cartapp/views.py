@@ -157,7 +157,7 @@ def update_cart(request, product_id):
 
                 else:
                     messages.warning(request, 'Sorry, the selected quantity exceeds the available stock.')
-
+                    # return JsonResponse({'status': 'Sorry, the selected quantity exceeds the available stock.'}, status=200)
             except Exception as e:
                pass
         else:
