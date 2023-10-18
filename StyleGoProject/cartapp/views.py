@@ -344,6 +344,18 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             except Wallet.DoesNotExist:
                 pass
 
+            try:
+
+                cart_item = cart_items.first()
+                if cart_item.quantity >cart_item.product_variant.quantity:
+                    messages.warning(request, 'OOPS ! Sorry the product is not available now')
+                    return redirect('shop:shop_product')
+                    # return JsonResponse({'status': 'Sorry, the selected quantity exceeds the available stock.'}, status=200)
+            except Exception as e:
+               pass
+
+
+        print('hello')
         for cart_item in cart_items:
             product = cart_item.product
             offer_price = calculate_offered_price(cart_item.product)
@@ -443,11 +455,12 @@ def addToWishlist(request):
                         product_id=product_id
                     )
                    # messages.success(request, 'Product added to wishlist successfully')
-                   return JsonResponse({'status': 'Product added to wishlist successfully'})
-    except Exception as e:
-        import traceback
 
-        return JsonResponse({'status': 'error', 'error': str(e)})
+                return JsonResponse({'status': 'Product added to wishlist successfully'})
+            else:
+                 return JsonResponse({'status': 'Please Login to add to wishlist'}, status=200)
+    except Exception as e:
+       pass
 
     # Add this part to handle GET requests
     return JsonResponse({'status': 'error', 'error': 'Invalid request method'})

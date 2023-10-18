@@ -123,15 +123,44 @@
                 <h6 class="m-0">Categories</h6>
                 <i class="fa fa-angle-down text-dark"></i>
             </a>
-            <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 navbar-custom" id="navbar-vertical" style="max-width: 250px; height: 310px; position: fixed; overflow-y: auto;">
-
-<!--            <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 navbar-custom" id="navbar-vertical">-->
-                <div class="navbar-nav w-100 overflow-hidden" style="max-width: 250px; height: 310px; position: fixed;">
+            <!-- HTML with Bootstrap classes -->
+<!-- HTML with inline CSS -->
+<nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 navbar-custom" id="navbar-vertical">
+    <style>
+        /* Add this to your HTML file within the style tag */
+        .category-box {
+            display: block;
+            width: 100%; /* Each box takes up the full width of the container */
+            padding: 10px; /* Adjust the padding as needed */
+            margin-bottom: 5px; /* Adjust the margin as needed */
+            background-color: #f8f9fa; /* Set the background color as per your design */
+            border: 1px solid #dee2e6; /* Set the border color as per your design */
+            border-radius: 4px; /* Optional: Add rounded corners */
+        }
+    </style>
+    <div class="navbar-nav w-100 overflow-hidden w-100" style="max-width: 250px; height: 310px; position: fixed;">
         {% for category in categories %}
-            <a href="{% url 'shop:shop_product_by_category' category.id %}" class="nav-item nav-link">{{ category.category_name }}</a>
+            <a href="{% url 'shop:shop_product_by_category' category.id %}" class="nav-item nav-link category-box">{{ category.category_name }}</a>
         {% endfor %}
     </div>
 </nav>
+
+
+
+
+
+
+
+
+<!--            <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 navbar-custom" id="navbar-vertical" style="max-width: 250px; height: 310px; position: fixed; overflow-y: auto;">-->
+
+<!--&lt;!&ndash;            <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 navbar-custom" id="navbar-vertical">&ndash;&gt;-->
+<!--                <div class="navbar-nav w-100 overflow-hidden" style="max-width: 250px; height: 310px; position: fixed;">-->
+<!--        {% for category in categories %}-->
+<!--            <a href="{% url 'shop:shop_product_by_category' category.id %}" class="nav-item nav-link">{{ category.category_name }}</a>-->
+<!--        {% endfor %}-->
+<!--    </div>-->
+<!--</nav>-->
 
        </div>
         <div class="col-lg-9">

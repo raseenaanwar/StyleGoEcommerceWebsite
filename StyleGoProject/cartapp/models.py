@@ -24,7 +24,6 @@ class CartItem(models.Model):
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
-    # variations=models.ManyToManyField(Variation,blank=True)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE,null=True)
     quantity=models.PositiveIntegerField(null=False,blank=False)
     # total=models.DecimalField(max_digits=10,decimal_places=2,default=None)
@@ -46,8 +45,6 @@ class CartItem(models.Model):
             return offered_price * self.quantity
         else:
             return self.product.price * self.quantity
-    # def sub_total(self):
-    #     return self.product.price*self.quantity
 class Wishlist(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
